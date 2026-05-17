@@ -23,7 +23,7 @@ INITIAL_BACKOFF_SECONDS = 35  # Free tier asks to retry after ~35s
 
 def _build_prompt(problem, current_time: str) -> str:
     """
-    Build the prompt string to send to Gemini AI
+    Build the prompt string to send to Gemini AI.
     
     Args:
        problem: LeetCode problem object containing title, description, code and author
@@ -87,7 +87,7 @@ def _build_prompt(problem, current_time: str) -> str:
 
 
 def _clean_response(text: str) -> str:
-     """
+    """
     Strip accidental markdown fences Gemini sometimes wraps output in.
     
     Args:
