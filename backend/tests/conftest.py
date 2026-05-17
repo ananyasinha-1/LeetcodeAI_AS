@@ -105,10 +105,15 @@ def mock_generate_blog(app_module, mocker):
 def mock_post_to_platform(app_module, mocker):
     return mocker.patch.object(
         app_module,
-        "post_to_platform",
+        "publish_to_platforms",
         autospec=True,
-        return_value={"id": 123, "url": "https://dev.to/mock-post"},
-    )
+        return_value=[{
+            "platform": "devto",
+            "status": "success",
+            "url": "https://dev.to/mock-post",
+            "response": {"id": 123, "url": "https://dev.to/mock-post"}
+        }],
+        )
 
 
 @pytest.fixture
@@ -134,7 +139,6 @@ def mock_gemini_client(mocker):
 @pytest.fixture
 def mock_devto_request(mocker):
     devto_module = importlib.import_module("devto")
-    mocker.patch.object(devto_module, "API_KEY", "test-devto-key")
     response = Mock(name="devto_response")
     response.status_code = 201
     response.json.return_value = {"id": 123, "url": "https://dev.to/mock-post"}

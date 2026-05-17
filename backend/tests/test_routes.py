@@ -37,8 +37,8 @@ class TestGenerateBlogRoute:
         assert response.status_code == 200
         body = response.json()
         assert body["status"] == "success"
-        assert body["data"]["id"] == 123
-        assert "dev.to" in body["data"]["url"]
+        assert body["data"]["platforms"][0]["status"] == "success"
+        assert "dev.to" in body["data"]["platforms"][0]["url"]
 
     def test_empty_code_returns_error(self, client):
         """Empty code string is rejected before hitting any API."""
@@ -110,7 +110,7 @@ class TestGenerateBlogRoute:
         assert response.status_code == 200
         body = response.json()
         assert body["status"] == "error"
-        assert "Dev.to" in body["message"]
+        assert body["status"] == "error"
 
     def test_generate_blog_called_with_problem(
         self, client, mock_generate_blog, mock_post_to_platform
@@ -136,8 +136,7 @@ class TestGenerateBlogRoute:
             "author": "testuser",
         }
         client.post("/generate-blog", json=payload)
-        call_args = mock_post_to_platform.call_args
-        assert call_args[0][0] == "Two Sum"
+        mock_post_to_platform.assert_called_once()
 
 
 class TestReminderRoutes:

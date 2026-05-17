@@ -3,6 +3,16 @@ Unit tests for the Dev.to publishing service in devto.py.
 Tests use mock_devto_request to avoid real HTTP calls.
 """
 
+import os
+import sys
+import pytest
+from pathlib import Path
+from unittest.mock import Mock, patch
+
+BACKEND_DIR = Path(__file__).resolve().parents[1]
+if str(BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(BACKEND_DIR))
+
 
 class TestPostToPlatform:
 
@@ -47,6 +57,22 @@ class TestPostToPlatform:
         mock_devto_request["response"].status_code = 500
         mock_devto_request["response"].text = "Internal Server Error"
 
-        import pytest
         with pytest.raises(Exception):
             post_to_platform("Two Sum", "# Blog content")
+
+
+class TestNormalizePlatforms:
+
+    def test_defaults_to_devto(self):
+        from devto import normalize_platforms
+        assert normalize_platforms(None) == ["devto"]
+
+    def test_deduplicates_platforms(self):
+        from devto import normalize_platforms
+        result = normalize_platforms(["dev.to", "devto"])
+        assert result == ["devto"]
+
+    def test_rejects_unknown_provider(self):
+        from devto import normalize_platforms, PublisherError
+        with pytest.raises(PublisherError):
+            normalize_platforms(["wordpress"])
