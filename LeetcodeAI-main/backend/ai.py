@@ -1,9 +1,10 @@
-from google import genai
+import logging
 import os
 import time
-import logging
-from dotenv import load_dotenv
 from datetime import datetime
+
+from dotenv import load_dotenv
+from google import genai
 
 load_dotenv()
 
@@ -82,7 +83,7 @@ def _build_prompt(problem, current_time: str) -> str:
                 Additional User Prompt Preferences:
                 {cleaned_custom_prompt}
             """
-    
+
     return f"""
             {default_prompt}
             {custom_instructions}
