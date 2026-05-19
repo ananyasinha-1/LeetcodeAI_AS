@@ -38,7 +38,7 @@ def _build_prompt(problem, current_time: str) -> str:
     """
     custom_instructions = ""
 
-    default_prompt =  f"""
+    default_prompt = f"""
         You are a professional technical writer and competitive programmer.
 
         Generate a highly engaging, beginner-friendly Dev.to blog post about a LeetCode problem.
@@ -76,10 +76,10 @@ def _build_prompt(problem, current_time: str) -> str:
         - Always provide an EMPTY LINE before and after the table to ensure correct rendering.
     """
 
-    if hasattr(problem,"custom_prompt") and problem.custom_prompt:
+    if hasattr(problem, "custom_prompt") and problem.custom_prompt:
         cleaned_custom_prompt = problem.custom_prompt.strip()
         if cleaned_custom_prompt:
-            custom_instructions =  f"""
+            custom_instructions = f"""
                 Additional User Prompt Preferences:
                 {cleaned_custom_prompt}
             """
@@ -152,8 +152,7 @@ def generate_blog(problem) -> str:
         for attempt in range(1, MAX_RETRIES + 1):
             try:
                 response = client.models.generate_content(
-                    model=model_name,
-                    contents=prompt
+                    model=model_name, contents=prompt
                 )
 
                 if not response.text:
@@ -165,7 +164,9 @@ def generate_blog(problem) -> str:
                 error_str = str(e)
 
                 # --- Leaked / invalid key: no point retrying ---
-                if "403" in error_str and ("leaked" in error_str.lower() or "invalid" in error_str.lower()):
+                if "403" in error_str and (
+                    "leaked" in error_str.lower() or "invalid" in error_str.lower()
+                ):
                     raise Exception(
                         "Your Gemini API key is invalid or has been reported as leaked. "
                         "Please generate a new key at https://aistudio.google.com/app/apikey "
@@ -173,18 +174,28 @@ def generate_blog(problem) -> str:
                     )
 
                 # --- Rate limited: wait and retry ---
-                if "429" in error_str or "quota" in error_str.lower() or "rate" in error_str.lower():
+                if (
+                    "429" in error_str
+                    or "quota" in error_str.lower()
+                    or "rate" in error_str.lower()
+                ):
                     if attempt < MAX_RETRIES:
                         wait = INITIAL_BACKOFF_SECONDS * attempt
                         logger.warning(
                             "Rate limited on %s (attempt %d/%d). Retrying in %ds...",
-                            model_name, attempt, MAX_RETRIES, wait
+                            model_name,
+                            attempt,
+                            MAX_RETRIES,
+                            wait,
                         )
                         time.sleep(wait)
                         continue
                     else:
                         # Exhausted retries on this model, try the next one
-                        logger.warning("Quota exhausted on %s. Falling back to next model.", model_name)
+                        logger.warning(
+                            "Quota exhausted on %s. Falling back to next model.",
+                            model_name,
+                        )
                         last_error = Exception(
                             f"Rate limit hit on {model_name} after {MAX_RETRIES} retries. "
                             "Please wait a minute and try again, or upgrade your Gemini API plan."
