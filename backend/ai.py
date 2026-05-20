@@ -3,11 +3,10 @@ import os
 import time
 from datetime import datetime
 
+import numpy as np
 from dotenv import load_dotenv
 from google import genai
-
 from sentence_transformers import SentenceTransformer
-import numpy as np
 
 load_dotenv()
 
@@ -61,7 +60,7 @@ def _cosine_similarity(malcious_emb: np.ndarray, user_prompt_emb: np.ndarray) ->
         return float(np.dot(malcious_emb, user_prompt_emb) / norm_product)
     else:
         return 0.0
-    
+
 def _is_malicious(text: str) -> bool:
     """
     Checks if the user prompt is malicious or not
