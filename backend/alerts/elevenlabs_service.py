@@ -9,12 +9,7 @@ def get_elevenlabs_client():
     return ElevenLabs(api_key=api_key)
 
 def generate_message(user_name: str):
-    return f"""
-    Hey {user_name},
-    you have not solved your daily coding problem today.
-    Consistency matters.
-    Open LeetcodeAI and continue your streak.
-    """
+    return "6 Lakh ki mehnat krke 35 Lakh ke sapne nhi dekhe jate, DSA Solve kr chl"
 
 def generate_audio(text: str) -> str:
     """Generates audio and saves it to static/reminder.mp3. Returns the file path."""

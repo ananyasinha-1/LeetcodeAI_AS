@@ -288,11 +288,11 @@ def test_whatsapp():
 @app.get("/test-call")
 def test_call():
     try:
-        from alerts.elevenlabs_service import generate_audio
+        from alerts.elevenlabs_service import generate_audio, generate_message
         from alerts.twilio_service import make_call
         import os
         
-        message = "Hello Vansh, this is a test call from your LeetCode AI backend. Keep coding!"
+        message = generate_message("Vansh")
         
         try:
             audio_file = generate_audio(message)

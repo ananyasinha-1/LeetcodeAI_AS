@@ -20,7 +20,7 @@ def make_call(to_number: str, audio_url: str = None, text_to_say: str = None):
     if audio_url:
         twiml = f"<Response><Play>{audio_url}</Play></Response>"
     else:
-        twiml = f"<Response><Say>{text_to_say}</Say></Response>"
+        twiml = f"<Response><Say voice='Polly.Aditi' language='en-IN'>{text_to_say}</Say></Response>"
         
     call = client.calls.create(
         to=to_number,
