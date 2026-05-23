@@ -23,7 +23,7 @@ def generate_audio(text: str) -> str:
         raise ValueError("ELEVENLABS_API_KEY is not set")
         
     response = client.text_to_speech.convert(
-        voice_id="pNInz6obpgDQGcFmaJcg", # Standard Adam voice
+        voice_id="21m00Tcm4TlvDq8ikWAM", # Standard Rachel voice
         optimize_streaming_latency="0",
         output_format="mp3_22050_32",
         text=text,
