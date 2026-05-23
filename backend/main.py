@@ -102,6 +102,20 @@ async def create_blog(problem: Problem):
     1. Generates a blog using Gemini AI
     2. Publishes it to one or more configured platforms
     """
+    
+    # Check if the user has already published a successful blog for this problem
+    existing_record = await db.problem_info.find_one({
+        "title": problem.title,
+        "author": problem.author,
+        "status": "success"
+    })
+    
+    if existing_record:
+        return {
+            "status": "error", 
+            "message": f"Solution for '{problem.title}' has already been published! Keep up the great streak!"
+        }
+
     if problem.custom_prompt and len(problem.custom_prompt.strip()) > 1000:
         raise HTTPException(
             status_code=400,
