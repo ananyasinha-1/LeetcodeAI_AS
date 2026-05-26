@@ -10,7 +10,8 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from twilio.rest import Client
 
-from ai import generate_blog
+# --- UPDATED AI PATH ---
+from ai_core.blog_generator import generate_blog
 from devto import publish_to_platforms
 from models.reminder import PublishRecord
 from services.reminder_scheduler import start_scheduler
@@ -55,6 +56,7 @@ class Problem(BaseModel):
     author: str = "Anonymous Developer"
     client_time: str = None  # Optional client time string
     custom_prompt: str = None  # custom_prompt for the user
+    difficulty: str = "Unknown"  # difficulty level of the problem
     platforms: list[str] | None = None
     publish_as_draft: bool = False
     share_to_social: bool = True
@@ -76,7 +78,6 @@ async def startup_event():
     """
     Start background schedulers when server starts.
     """
-
     try:
         start_scheduler()
         print("Reminder scheduler started successfully.")
@@ -99,7 +100,7 @@ def health_check():
 async def create_blog(problem: Problem):
     """
     Accepts a LeetCode problem and:
-    1. Generates a blog using Gemini AI
+    1. Generates a blog using the unified ai.providers module
     2. Publishes it to one or more configured platforms
     """
 
@@ -127,9 +128,11 @@ async def create_blog(problem: Problem):
 
     try:
         blog_content = generate_blog(problem)
-
     except Exception as e:
-        return {"status": "error", "message": f"Gemini API failure: {str(e)}"}
+        return {
+                "status": "error",
+                "message": f"AI provider failure: {str(e)}"
+            }
 
     try:
         platform_results = publish_to_platforms(
@@ -202,7 +205,9 @@ async def create_blog(problem: Problem):
     }
 
 
-# dashboard endpoints
+# -----------------------------
+# Dashboard Endpoints
+# -----------------------------
 @app.get("/dashboard/stats")
 async def get_dashboard_stats():
     total = await db.problem_info.count_documents({})
@@ -277,8 +282,6 @@ async def record_publish(record: PublishRecord):
     )
     return {"status": "ok"}
 
-
-
 # -----------------------------
 # Reminder Infrastructure
 # -----------------------------
@@ -287,7 +290,6 @@ def reminder_health():
     """
     Health check endpoint for reminder services.
     """
-
     return {"status": "active", "message": "Reminder call infrastructure is running."}
 
 @app.get("/test-whatsapp")
@@ -343,9 +345,8 @@ def test_call():
 @app.post("/reminder/subscribe")
 async def subscribe(pref: ReminderPreference):
     await db.preferences.update_one(
-        {"whatsapp_number": pref.whatsapp_number}, {"$set": pref.dict()}, upsert=True
+        {"whatsapp_number": pref.whatsapp_number}, {"$set": pref.model_dump()}, upsert=True
     )
-
     return {"status": "success", "message": "Subscribed!"}
 
 
@@ -354,7 +355,6 @@ async def unsubscribe(data: dict):
     await db.preferences.update_one(
         {"whatsapp_number": data["whatsapp_number"]}, {"$set": {"is_opted_in": False}}
     )
-
     return {"status": "success", "message": "Unsubscribed!"}
 
 
@@ -362,4 +362,9 @@ async def unsubscribe(data: dict):
 # Run Server
 # -----------------------------
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=10000, reload=True)
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=10000,
+        reload=True
+    )

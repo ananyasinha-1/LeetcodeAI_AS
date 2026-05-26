@@ -39,9 +39,14 @@ async def _check_unsolved_users_async():
         lc_username = user.get("leetcode_username", "vanshaggarwal27")
         if not has_solved and lc_username:
             try:
+              main
                 import requests
                 # import asyncio
                 # import datetime
+                import asyncio
+                import datetime
+
+                import requests
 
                 def check_lc():
                     query = """
@@ -71,6 +76,7 @@ async def _check_unsolved_users_async():
                         break
             except Exception as e:
                 print(f"Failed to check Leetcode for {lc_username}:", e)
+
         if not has_solved:
             # Not solved today, send reminder!
             name = "Vansh" # Fallback or could add name to DB
@@ -83,6 +89,7 @@ async def _check_unsolved_users_async():
                 print(f"WhatsApp message sent successfully to {phone}!")
             except Exception as e:
                 print(f"Failed to send WhatsApp message to {phone}:", e)
+
             try:
                 # 1. Try to Generate Audio via ElevenLabs
                 from alerts.elevenlabs_service import generate_audio
@@ -111,6 +118,7 @@ async def _check_unsolved_users_async():
 
             except Exception as e:
                 print(f"Failed to generate audio or make call to {phone}:", e)
+
         else:
             print(f"User {phone} has already solved {solved_today_count} problems today!")
 
