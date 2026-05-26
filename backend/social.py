@@ -5,6 +5,7 @@ from typing import Any
 import requests
 import tweepy
 
+
 @dataclass(frozen=True)
 class SocialResult:
     platform: str
@@ -157,4 +158,3 @@ def share_to_platforms(title: str, post_url: str, tags: list[str] | None = None)
                 )
             )
     return [r.as_dict() for r in results]
-    

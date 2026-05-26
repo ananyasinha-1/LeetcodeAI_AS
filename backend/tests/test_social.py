@@ -1,5 +1,7 @@
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
 from social import share_to_platforms
+
 
 def test_share_to_platforms_twitter_success(monkeypatch):
     monkeypatch.setenv("TWITTER_API_KEY", "key")
