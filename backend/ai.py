@@ -54,28 +54,9 @@ def _is_malicious(text: str) -> bool:
     for malicious_phrase in MALICIOUS_PROMPTS_LIST:
         # Simple substring match
         if malicious_phrase.lower() in text_lower:
-            raise Exception(f"Malicious prompt injection detected: matched '{malicious_phrase}'")
+            raise ValueError(f"Malicious prompt injection detected: matched '{malicious_phrase}'")
 
     return False
-    # def _is_malicious(text: str) -> bool:
-#     """
-#     Checks if the user prompt is malicious or not using lightweight text matching.
-#     """
-#     if not text:
-#         return False
-
-#     text_lower = text.lower()
-
-#     for malicious_phrase in MALICIOUS_PROMPTS_LIST:
-#         # Simple substring match
-#         if malicious_phrase.lower() in text_lower:
-#             logger.warning(f"Malicious prompt injection detected: matched '{malicious_phrase}'")
-#             return True
-
-#         # Optional: could add fuzzy matching here if needed in the future,
-#         # but exact/substring match is much faster and doesn't require 2GB of PyTorch.
-
-#     return False
 
 def _compress_prompt(text: str, max_chars: int) -> str:
     """Compresses user prompt if it exceeds the set size."""
