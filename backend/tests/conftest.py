@@ -64,6 +64,17 @@ def app_module(monkeypatch: pytest.MonkeyPatch):
 
     fake_db = FakeDatabase()
 
+    # Clear all cached modules BEFORE patching and importing
+    for module_name in [
+        "main",
+        "alerts.scheduler",
+        "alerts.progress_checker",
+        "alerts.elevenlabs_service",
+        "services.reminder_scheduler",
+    ]:
+        sys.modules.pop(module_name, None)
+
+    # Patch BEFORE importing main so the imports use our mocks
     monkeypatch.setattr(
         "apscheduler.schedulers.background.BackgroundScheduler.start",
         lambda self: None,
@@ -77,17 +88,8 @@ def app_module(monkeypatch: pytest.MonkeyPatch):
         lambda *args, **kwargs: FakeMotorClient(fake_db),
     )
 
-    for module_name in [
-        "main",
-        "alerts.scheduler",
-        "alerts.progress_checker",
-        "alerts.elevenlabs_service",
-        "services.reminder_scheduler",
-    ]:
-        sys.modules.pop(module_name, None)
-
+    # NOW import main after mocking - it will use our fake_db
     module = importlib.import_module("main")
-    monkeypatch.setattr(module, "db", fake_db)
     monkeypatch.setattr(module, "start_scheduler", Mock(name="start_scheduler"))
     return module
 
