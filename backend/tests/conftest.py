@@ -10,6 +10,7 @@ Phase 2 will populate this file with:
 
 from __future__ import annotations
 
+import gc
 import importlib
 import sys
 from pathlib import Path
@@ -64,7 +65,7 @@ def app_module(monkeypatch: pytest.MonkeyPatch):
 
     fake_db = FakeDatabase()
 
-    # Clear all cached modules BEFORE patching and importing
+    # Clear all cached modules and bytecode BEFORE patching
     for module_name in [
         "main",
         "alerts.scheduler",
@@ -72,9 +73,13 @@ def app_module(monkeypatch: pytest.MonkeyPatch):
         "alerts.elevenlabs_service",
         "services.reminder_scheduler",
     ]:
-        sys.modules.pop(module_name, None)
+        if module_name in sys.modules:
+            del sys.modules[module_name]
 
-    # Patch BEFORE importing main so the imports use our mocks
+    # Force garbage collection to ensure bytecode is cleared
+    gc.collect()
+
+    # Patch BEFORE importing main so it uses our mocks
     monkeypatch.setattr(
         "apscheduler.schedulers.background.BackgroundScheduler.start",
         lambda self: None,
