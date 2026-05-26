@@ -30,6 +30,7 @@ class FakePreferencesCollection:
 class FakeDatabase:
     def __init__(self) -> None:
         self.preferences = FakePreferencesCollection()
+        self.problem_info = {}
 
 
 class FakeMotorClient:
