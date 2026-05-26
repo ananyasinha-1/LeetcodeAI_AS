@@ -1,4 +1,4 @@
-"""
+ """
 Shared pytest fixtures for the backend test suite.
 
 Phase 2 will populate this file with:
